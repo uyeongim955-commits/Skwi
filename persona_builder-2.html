@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0b0f14" />
+<title>刻印廳 — 각인자 등록 신청</title>
+<style>
+  :root{
+    --bg:#0b0f14; --panel:#111925; --panel2:#0d141d; --line:#243444;
+    --txt:#dbe7f2; --dim:#748899; --cyan:#59d6ff; --gold:#e6b94b; --red:#ff5a4d; --ok:#57d98a;
+    --mono:"IBM Plex Mono","Consolas",monospace;
+    --kr:"Pretendard","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--txt); font-family:var(--kr);
+    background-image:linear-gradient(rgba(89,214,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(89,214,255,.03) 1px,transparent 1px);
+    background-size:44px 44px; padding-bottom:60px;
+  }
+  button,input,select,textarea{font:inherit; color:inherit}
+  .scan{position:fixed; inset:0; z-index:1; pointer-events:none; opacity:.4;
+    background:repeating-linear-gradient(0deg,rgba(0,0,0,.13) 0 1px,transparent 2px 4px)}
+
+  header{position:sticky; top:0; z-index:20; background:rgba(11,15,20,.94); backdrop-filter:blur(8px); border-bottom:1px solid var(--line)}
+  .top{max-width:1180px; margin:auto; padding:13px 20px; display:flex; align-items:center; gap:14px; flex-wrap:wrap}
+  .seal{width:46px; height:46px; flex:none; border:2px solid var(--gold); border-radius:50%; display:grid; place-items:center;
+    color:var(--gold); font:900 15px/1 serif; background:rgba(230,185,75,.06); transform:rotate(-4deg)}
+  .tt b{display:block; font:800 17px/1.1 var(--kr); letter-spacing:.2em}
+  .tt span{display:block; margin-top:4px; font:600 9.5px/1 var(--mono); letter-spacing:.16em; color:var(--dim)}
+  .top .badge{margin-left:auto; border:1px solid var(--line); background:var(--panel); padding:7px 11px; font:700 10px/1.4 var(--mono); letter-spacing:.08em; color:var(--gold)}
+
+  main{max-width:1180px; margin:26px auto; padding:0 20px; display:grid; grid-template-columns:1fr 400px; gap:22px; align-items:start}
+
+  .intro{grid-column:1/-1; border:1px solid var(--line); background:var(--panel); padding:20px 22px; position:relative; overflow:hidden}
+  .intro::before{content:"REGISTRATION"; position:absolute; right:14px; top:6px; font:900 40px/1 var(--mono); color:rgba(89,214,255,.05); letter-spacing:.1em}
+  .intro h1{margin:0 0 8px; font:900 clamp(22px,3.4vw,32px)/1.15 var(--kr); letter-spacing:.01em}
+  .intro h1 em{font-style:normal; color:var(--cyan)}
+  .intro p{margin:0; color:#9fb2c2; font-size:13px; line-height:1.8; max-width:760px; word-break:keep-all}
+
+  .card{border:1px solid var(--line); background:var(--panel); padding:20px; margin-bottom:18px}
+  .card h2{margin:0 0 16px; font:800 15px/1 var(--kr); letter-spacing:.04em; display:flex; align-items:center; gap:9px}
+  .card h2::before{content:""; width:4px; height:15px; background:var(--cyan)}
+  .card h2 .no{margin-left:auto; font:700 10px/1 var(--mono); color:var(--dim); letter-spacing:.1em}
+
+  .field{margin-bottom:15px}
+  .field:last-child{margin-bottom:0}
+  label{display:block; font:700 11px/1 var(--kr); letter-spacing:.04em; color:var(--dim); margin-bottom:7px}
+  label .cnt{float:right; font:700 10px/1 var(--mono); color:var(--dim)}
+  label .cnt.warn{color:var(--red)}
+  label .cnt.ok{color:var(--ok)}
+  input[type=text],input[type=number],select,textarea{
+    width:100%; background:var(--panel2); border:1px solid var(--line); color:var(--txt);
+    padding:11px 12px; font-size:13.5px; outline:none; transition:.15s;
+  }
+  input:focus,select:focus,textarea:focus{border-color:var(--cyan); background:#0e1620}
+  textarea{resize:vertical; min-height:64px; line-height:1.6}
+  .row{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+  .row3{display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:12px}
+  .hint{margin-top:6px; font:600 10.5px/1.5 var(--mono); color:var(--dim); letter-spacing:.02em}
+
+  .seg{display:flex; flex-wrap:wrap; gap:6px}
+  .seg button{border:1px solid var(--line); background:var(--panel2); color:var(--dim); padding:8px 12px; cursor:pointer; font:700 12px/1 var(--kr); transition:.15s}
+  .seg button:hover{border-color:var(--cyan); color:var(--txt)}
+  .seg button.on{background:var(--cyan); color:#04222e; border-color:var(--cyan); font-weight:800}
+
+  .grades{display:grid; grid-template-columns:repeat(5,1fr); gap:6px}
+  .grade{border:1px solid var(--line); background:var(--panel2); cursor:pointer; padding:10px 6px 8px; text-align:center; transition:.15s; position:relative}
+  .grade:hover{border-color:var(--cyan)}
+  .grade.on{border-color:var(--gold); background:rgba(230,185,75,.08)}
+  .grade b{display:block; font:900 16px/1 var(--kr)}
+  .grade small{display:block; margin-top:5px; font:600 9px/1.3 var(--kr); color:var(--dim)}
+  .grade .bar{height:3px; margin-top:7px; background:#1b2733; overflow:hidden}
+  .grade .bar span{display:block; height:100%; background:linear-gradient(90deg,var(--cyan),var(--red))}
+  .grade.on b{color:var(--gold)}
+
+  .warnbox{margin-top:12px; border:1px solid rgba(255,90,77,.4); background:rgba(255,90,77,.07); padding:11px 13px; font-size:12px; line-height:1.6; color:#ffb1aa; display:none}
+  .warnbox.show{display:block}
+  .warnbox b{color:var(--red)}
+
+  .genbtn{width:100%; border:1px solid var(--gold); background:rgba(230,185,75,.08); color:var(--gold); padding:10px; cursor:pointer; font:800 12.5px/1 var(--kr); letter-spacing:.04em; transition:.15s; margin-bottom:14px}
+  .genbtn:hover{background:rgba(230,185,75,.16)}
+  .genbtn:active{transform:scale(.99)}
+
+  .randall{width:100%; border:1px solid var(--cyan); background:linear-gradient(90deg,rgba(89,214,255,.12),rgba(230,185,75,.1)); color:var(--txt); padding:13px; cursor:pointer; font:800 14px/1 var(--kr); letter-spacing:.03em; transition:.15s; margin-top:14px}
+  .randall:hover{background:linear-gradient(90deg,rgba(89,214,255,.22),rgba(230,185,75,.18))}
+  .randall:active{transform:scale(.995)}
+  .dice{float:right; margin-left:8px; border:1px solid var(--line); background:var(--panel2); color:var(--gold); cursor:pointer; font:700 10px/1 var(--kr); padding:3px 7px; transition:.15s}
+  .dice:hover{border-color:var(--gold); background:rgba(230,185,75,.12)}
+  label .cnt + .dice{margin-left:6px}
+
+  .scenario{margin-top:16px; border:1px solid var(--line); background:var(--panel2); padding:14px}
+  .scn-label{display:block; font:800 12px/1 var(--kr); letter-spacing:.05em; color:var(--gold); margin-bottom:10px}
+  .scn-label::before{content:"◈ "; }
+  #segScn button{flex:1; min-width:90px; padding:11px 8px; font-size:13px}
+  .scn-note{margin-top:10px; font:600 11px/1.6 var(--mono); color:var(--dim); letter-spacing:.02em; word-break:keep-all}
+  .lock{font:700 10px/1 var(--mono); color:var(--gold); letter-spacing:.04em}
+  input:read-only{opacity:.6; cursor:not-allowed; border-style:dashed}
+
+  .noawaken{display:flex; align-items:center; gap:9px; margin-bottom:14px; padding:10px 12px; border:1px dashed var(--line); background:var(--panel2); cursor:pointer; user-select:none}
+  .noawaken input{width:16px; height:16px; accent-color:var(--cyan)}
+  .noawaken span{font-size:12.5px; color:var(--dim)}
+  .awaken-fields.dim{opacity:.35; pointer-events:none}
+
+  /* 우측 프리뷰 */
+  .preview{position:sticky; top:84px}
+  .idcard{border:1px solid var(--cyan); background:linear-gradient(160deg,#0e1826,#0a1119); position:relative; overflow:hidden; box-shadow:0 16px 40px rgba(0,0,0,.5)}
+  .idcard::before{content:"刻印廳"; position:absolute; right:-8px; bottom:-14px; font:900 90px/1 serif; color:rgba(89,214,255,.05)}
+  .id-top{display:flex; align-items:center; gap:10px; padding:14px 16px; border-bottom:1px solid var(--line); background:rgba(89,214,255,.04)}
+  .id-top .dot{width:8px; height:8px; border-radius:50%; background:var(--ok); box-shadow:0 0 0 4px rgba(87,217,138,.14)}
+  .id-top b{font:800 12px/1 var(--kr); letter-spacing:.1em}
+  .id-top span{margin-left:auto; font:700 9px/1 var(--mono); color:var(--dim); letter-spacing:.1em}
+  .id-body{padding:18px 16px; position:relative; z-index:1}
+  .id-name{font:900 26px/1.1 var(--kr); letter-spacing:.01em}
+  .id-name .anon{color:var(--dim)}
+  .id-meta{margin-top:8px; font:700 11px/1.6 var(--mono); color:var(--cyan); letter-spacing:.03em}
+  .id-grade{display:inline-block; margin-top:12px; padding:5px 10px; border:1px solid var(--gold); color:var(--gold); font:800 11px/1 var(--kr); letter-spacing:.06em}
+  .id-grade.none{border-color:var(--dim); color:var(--dim)}
+  .id-mark{margin-top:14px; padding-top:13px; border-top:1px dashed var(--line)}
+  .id-mark .k{font:700 9px/1 var(--mono); color:var(--dim); letter-spacing:.14em}
+  .id-mark .v{margin-top:6px; font:800 15px/1.4 var(--kr)}
+  .id-mark .v small{color:var(--gold); font-weight:700}
+  .id-mark .eff{margin-top:5px; font-size:12px; line-height:1.6; color:#9fb2c2; word-break:keep-all}
+  .id-affil{margin-top:12px; font:700 10.5px/1 var(--mono); letter-spacing:.06em}
+  .id-appear{margin-top:8px; font-size:11.5px; line-height:1.5; color:#8ea3b5; word-break:keep-all}
+
+  .out{border:1px solid var(--line); background:var(--panel); margin-top:16px}
+  .out-h{padding:12px 15px; border-bottom:1px solid var(--line); font:800 12px/1 var(--kr); letter-spacing:.06em; display:flex; align-items:center; gap:8px}
+  .out-h::before{content:"▸"; color:var(--cyan)}
+  .out-row{padding:13px 15px; border-bottom:1px solid var(--line)}
+  .out-row:last-child{border-bottom:0}
+  .out-row .lab{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:7px}
+  .out-row .lab b{font:700 11px/1 var(--kr); color:var(--dim); letter-spacing:.06em}
+  .out-row .lab .c{font:700 10px/1 var(--mono)}
+  .out-val{background:var(--panel2); border:1px solid var(--line); padding:10px 11px; font-size:12.5px; line-height:1.6; min-height:20px; word-break:break-all; white-space:pre-wrap}
+  .copy{margin-top:8px; width:100%; border:1px solid var(--cyan); background:transparent; color:var(--cyan); padding:8px; cursor:pointer; font:800 11.5px/1 var(--kr); letter-spacing:.05em; transition:.15s}
+  .copy:hover{background:rgba(89,214,255,.12)}
+  .copy.done{border-color:var(--ok); color:var(--ok)}
+
+  .infoblk{margin-top:16px; border:1px solid var(--line); background:#05080b; padding:14px; font:600 11.5px/1.9 var(--mono); color:#a9bccb; white-space:pre-wrap; letter-spacing:.02em}
+  .infoblk .g{color:var(--gold)} .infoblk .c{color:var(--cyan)} .infoblk .d{color:var(--dim)}
+
+  footer{max-width:1180px; margin:30px auto 0; padding:16px 20px; border-top:1px solid var(--line); font:600 10.5px/1.7 var(--mono); color:var(--dim)}
+
+  @media (max-width:920px){
+    main{grid-template-columns:1fr}
+    .preview{position:static}
+    .grades{grid-template-columns:repeat(5,1fr)}
+  }
+  @media (max-width:560px){
+    .row,.row3{grid-template-columns:1fr}
+    .grade b{font-size:14px}
+    .grade small{font-size:8px}
+    .intro::before{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="scan" aria-hidden="true"></div>
+
+<header>
+  <div class="top">
+    <div class="seal">刻印</div>
+    <div class="tt"><b>각인관리청</b><span>AWAKENED REGISTRATION TERMINAL</span></div>
+    <div class="badge">《여명각인》 페르소나 빌더</div>
+  </div>
+</header>
+
+<main>
+  <section class="intro">
+    <h1>당신의 <em>각인자 등록증</em>을 작성하십시오.</h1>
+    <p>절실함이 임계를 넘은 자에게 태양은 이름을 새긴다. 아래 항목을 채우면 크랙에 바로 붙여 넣을 페르소나(이름 12자 · 정보 150자)가 자동으로 완성됨. 각 슬롯의 글자수 제한을 실시간으로 확인할 수 있음. ⓤ는 원작 《여명각인》 속 레이의 라이벌 포지션에 빙의한 인물임을 참고할 것.</p>
+    <div class="scenario">
+      <span class="scn-label">시작설정 선택 (먼저 고르고 랜덤 생성)</span>
+      <div class="seg" id="segScn">
+        <button data-v="소꿉친구">소꿉친구</button>
+        <button data-v="내통자">내통자</button>
+        <button data-v="자유설정">자유설정</button>
+      </div>
+      <div class="scn-note" id="scnNote">시작설정을 고르면 나이·소속·배경이 그에 맞춰 랜덤 생성됨.</div>
+    </div>
+    <button class="randall" id="randAll" type="button">🎲 전체 랜덤 생성 — 각인자 하나 뽑기</button>
+  </section>
+
+  <!-- 좌: 입력 -->
+  <div class="form">
+    <div class="card">
+      <h2>기본 정보 <span class="no">SECTION 01</span></h2>
+      <div class="field">
+        <label>이름 / 호칭 <span class="cnt" id="cntName">0/12</span><button class="dice" data-r="name" type="button">🎲</button></label>
+        <input type="text" id="fName" maxlength="16" placeholder="예: 야가미 소라" />
+        <div class="hint">페르소나 이름 슬롯 = 12자 제한. 초과분은 잘릴 수 있음</div>
+      </div>
+      <div class="row3">
+        <div class="field">
+          <label>성별</label>
+          <div class="seg" id="segSex">
+            <button data-v="남">남</button><button data-v="여">여</button><button data-v="기타">기타</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>나이 <span class="lock" id="ageLock"></span></label>
+          <input type="number" id="fAge" min="1" max="999" placeholder="20" />
+        </div>
+        <div class="field">
+          <label>1인칭</label>
+          <input type="text" id="fFirst" maxlength="6" placeholder="나 / 저" />
+        </div>
+      </div>
+      <div class="field">
+        <label>외형 <span class="cnt" id="cntApp">0/30</span><button class="dice" data-r="appear" type="button">🎲</button></label>
+        <input type="text" id="fAppear" maxlength="40" placeholder="예: 흑발 단발·날카로운 눈매·마른 체형" />
+        <div class="hint" id="appHint">자유설정 전체 랜덤 시 자동 포함 (다른 설정은 🎲로 개별 생성)</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>각인 등록 <span class="no">SECTION 02</span></h2>
+      <button class="genbtn" id="genBtn" type="button">🎲 각인 아이디어 뽑기 (랜덤 제안)</button>
+      <label class="noawaken" for="fNone">
+        <input type="checkbox" id="fNone" />
+        <span>아직 각인 없음 (일반인 · 미각성) — 체크 시 각인 항목은 "없음" 처리</span>
+      </label>
+      <div class="awaken-fields" id="awakenFields">
+        <div class="row">
+          <div class="field">
+            <label>각인명 <span class="cnt" id="cntMark">0/8</span></label>
+            <input type="text" id="fMark" maxlength="12" placeholder="예: 잔향(殘響)" />
+          </div>
+          <div class="field">
+            <label>진명 · 완전해방 <span class="cnt" id="cntTrue">0/10</span></label>
+            <input type="text" id="fTrue" maxlength="14" placeholder="예: 무한잔향(無限殘響)" />
+          </div>
+        </div>
+        <div class="field">
+          <label>능력 효과 <span class="cnt" id="cntEff">0/40</span></label>
+          <textarea id="fEff" maxlength="60" placeholder="예: 소리를 물질화해 반사·증폭시킨다"></textarea>
+          <div class="hint">한 줄로 간결하게. 발동 조건·대가가 있으면 좋음</div>
+        </div>
+        <div class="field">
+          <label>공인 등급 (외부 관측 출력 기준)</label>
+          <div class="grades" id="grades">
+            <div class="grade" data-g="4급" data-w="20"><b>4급</b><small>개인</small><div class="bar"><span style="width:20%"></span></div></div>
+            <div class="grade" data-g="3급" data-w="40"><b>3급</b><small>다수 제압</small><div class="bar"><span style="width:40%"></span></div></div>
+            <div class="grade" data-g="2급" data-w="60"><b>2급</b><small>부대·시설</small><div class="bar"><span style="width:60%"></span></div></div>
+            <div class="grade" data-g="1급" data-w="80"><b>1급</b><small>도시 기능</small><div class="bar"><span style="width:80%"></span></div></div>
+            <div class="grade" data-g="특급" data-w="100"><b>특급</b><small>국가급</small><div class="bar"><span style="width:100%"></span></div></div>
+          </div>
+          <div class="warnbox" id="gradeWarn"><b>밸런스 주의.</b> 1급·특급은 국가·도시 단위 위협으로, 원작 서열상 소수 정점 캐릭터의 영역임. 빙의 초반부터 이 등급이면 ⓤ 주인공화 방지 규칙과 충돌해 전개가 붕괴하기 쉬움. 성장형으로 4~3급에서 시작하길 권장.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>소속 · 입장 <span class="no">SECTION 03</span></h2>
+      <div class="field">
+        <div class="seg" id="segAffil">
+          <button data-v="서광반">서광반(관리청 특무)</button>
+          <button data-v="관리청">각인관리청</button>
+          <button data-v="일식회">일식회</button>
+          <button data-v="무소속">무소속·프리랜서</button>
+          <button data-v="민간">일반 민간인</button>
+        </div>
+        <div class="hint">레이·리코의 소꿉친구 포지션이면 서광반 또는 민간이 자연스러움</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>성격 · 배경 <span class="no">SECTION 04</span></h2>
+      <div class="field">
+        <label>성격 키워드 <span class="cnt" id="cntPer">0/30</span><button class="dice" data-r="pers" type="button">🎲</button></label>
+        <input type="text" id="fPers" maxlength="40" placeholder="예: 무심한 척 챙기는 츤데레, 눈치 빠름" />
+      </div>
+      <div class="field">
+        <label>한 줄 배경 · 훅 <span class="cnt" id="cntBg">0/40</span><button class="dice" data-r="bg" type="button">🎲</button></label>
+        <textarea id="fBg" maxlength="60" placeholder="예: 레이와 같은 고아원 출신, 빚에 쫓기는 중"></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>장비 (INFO 표시용) <span class="no">SECTION 05</span></h2>
+      <div class="row">
+        <div class="field">
+          <label>무기<button class="dice" data-r="weapon" type="button">🎲</button></label>
+          <input type="text" id="fWeapon" maxlength="20" placeholder="예: 접이식 특수봉 / 없음" />
+        </div>
+        <div class="field">
+          <label>소지품<button class="dice" data-r="item" type="button">🎲</button></label>
+          <input type="text" id="fItem" maxlength="30" placeholder="예: 스마트폰, 낡은 회중시계" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 우: 프리뷰 + 출력 -->
+  <div class="preview">
+    <div class="idcard">
+      <div class="id-top"><span class="dot"></span><b>刻印者 登錄證</b><span id="pvId">NO.—</span></div>
+      <div class="id-body">
+        <div class="id-name" id="pvName"><span class="anon">미등록 각인자</span></div>
+        <div class="id-meta" id="pvMeta">— · —</div>
+        <span class="id-grade none" id="pvGrade">등급 미판정</span>
+        <div class="id-mark">
+          <div class="k">刻印 / MARK</div>
+          <div class="v" id="pvMark">없음</div>
+          <div class="eff" id="pvEff"></div>
+        </div>
+        <div class="id-affil" id="pvAffil"></div>
+        <div class="id-appear" id="pvAppear"></div>
+      </div>
+    </div>
+
+    <div class="out">
+      <div class="out-h">크랙 페르소나 (복붙용)</div>
+      <div class="out-row">
+        <div class="lab"><b>이름 슬롯</b><span class="c" id="cName">0/12</span></div>
+        <div class="out-val" id="oName"></div>
+        <button class="copy" data-t="oName" type="button">이름 복사</button>
+      </div>
+      <div class="out-row">
+        <div class="lab"><b>정보 슬롯</b><span class="c" id="cInfo">0/150</span></div>
+        <div class="out-val" id="oInfo"></div>
+        <button class="copy" data-t="oInfo" type="button">정보 복사</button>
+      </div>
+    </div>
+
+    <div class="infoblk" id="infoPreview"></div>
+  </div>
+</main>
+
+<footer>
+  刻印廳 REGISTRATION TERMINAL · 《여명각인》 페르소나 빌더 — 입력값은 이 브라우저에만 있으며 서버로 전송되지 않음.<br>
+  생성된 페르소나는 크랙 편집창 글자수 기준으로 다시 확인 권장.
+</footer>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const state = {
+    scenario:"", name:"", sex:"", age:"", first:"", appear:"", none:false,
+    mark:"", true_:"", eff:"", grade:"", affil:"",
+    pers:"", bg:"", weapon:"", item:""
+  };
+
+  // 각인 아이디어 풀 (원작 캐릭터와 비충돌 오리지널)
+  const IDEAS = [
+    {m:"잔향(殘響)", t:"무한잔향(無限殘響)", e:"소리를 물질화해 반사·증폭시킴", g:"3급"},
+    {m:"서리꽃(霜花)", t:"빙정만화(氷晶滿華)", e:"접촉면을 급속 결빙, 지속 시 자기 체온도 뺏김", g:"3급"},
+    {m:"그림자못(影池)", t:"심연무저(深淵無底)", e:"자기 그림자에 사물을 담아 옮김, 부피 한계 있음", g:"3급"},
+    {m:"실타래(絲)", t:"천잠사박(天蠶絲縛)", e:"보이지 않는 실로 대상을 포박, 시야 필요", g:"2급"},
+    {m:"되감기(逆)", t:"시침역행(時針逆行)", e:"자기 신체 상태만 수 초 되돌림, 격통 대가", g:"2급"},
+    {m:"울림종(鐘)", t:"경세명종(警世鳴鐘)", e:"종을 울려 범위 내 움직임을 한 박자 멈춤", g:"3급"},
+    {m:"등불(燈)", t:"천리안행(千里眼行)", e:"불빛이 닿은 장소를 원격으로 관측", g:"4급"},
+    {m:"모래시계(沙)", t:"일각천추(一刻千秋)", e:"자기 주변 반경의 체감 시간을 늦춤", g:"2급"},
+    {m:"거울못(鏡)", t:"경화수월(鏡花水月)", e:"날아오는 공격을 한 번 반사, 재사용 텀 있음", g:"2급"},
+    {m:"씨앗(種)", t:"만화방창(萬化方暢)", e:"식물을 급속 성장·조종, 토양 필요", g:"3급"},
+    {m:"낙인(烙)", t:"각골명심(刻骨銘心)", e:"새긴 표식으로 대상 위치를 상시 추적", g:"4급"},
+    {m:"저울추(錘)", t:"천균일발(千鈞一髮)", e:"접촉 대상의 무게를 무겁게·가볍게 조작", g:"3급"},
+    {m:"메아리길(響)", t:"공곡족음(空谷足音)", e:"들은 목소리를 완벽히 복제해 냄", g:"4급"},
+    {m:"불씨(燼)", t:"요원지화(燎原之火)", e:"작은 불을 순간 확산·조종, 산소 소모 큼", g:"2급"},
+    {m:"매듭(結)", t:"백년가약(百年佳約)", e:"두 대상을 묶어 한쪽 피해를 나눔", g:"3급"},
+    {m:"물그림자(水影)", t:"상선약수(上善若水)", e:"몸을 물처럼 흘려 물리 타격을 흘려냄", g:"2급"},
+    {m:"자물쇠(錠)", t:"금성탕지(金城湯池)", e:"공간 하나를 잠가 출입을 막음", g:"2급"},
+    {m:"바늘(針)", t:"미세지침(微細之針)", e:"극소형 바늘을 원격 조종, 정밀 조작", g:"3급"},
+    {m:"안개(霧)", t:"오리무중(五里霧中)", e:"짙은 안개를 퍼뜨려 시야·감각 교란", g:"3급"},
+    {m:"발자국(跡)", t:"설니홍조(雪泥鴻爪)", e:"남의 발자국을 되짚어 이동 경로 재생", g:"4급"},
+    {m:"먹물(墨)", t:"근묵자흑(近墨者黑)", e:"그린 그림을 잠시 실체화, 붓·먹 필요", g:"3급"},
+    {m:"태엽(齒)", t:"교아절치(咬牙切齒)", e:"기계·장치를 접촉해 강제 작동·정지", g:"3급"},
+    {m:"파문(波)", t:"일파만파(一波萬波)", e:"수면·지면에 충격파를 퍼뜨림", g:"2급"},
+    {m:"깃털(羽)", t:"경거중골(輕擧重骨)", e:"자기 체중을 극단적으로 낮춰 활공", g:"4급"},
+    {m:"소금(鹽)", t:"염화작용(鹽花作用)", e:"수분을 결정화해 굳힘, 습도 의존", g:"3급"},
+    {m:"거미줄(網)", t:"천라지각(天羅地角)", e:"점착성 줄을 사출해 포획·이동", g:"3급"},
+    {m:"메뚜기(蝗)", t:"창황분주(蒼黃奔走)", e:"짧은 순간 폭발적 도약·가속", g:"4급"},
+    {m:"이명(鳴)", t:"이명경인(耳鳴驚人)", e:"고주파로 대상의 평형감각 교란", g:"3급"},
+    {m:"부적(符)", t:"호신부적(護身符籍)", e:"부적을 붙인 대상에 방어막 부여", g:"3급"},
+    {m:"자성(磁)", t:"자기감응(磁氣感應)", e:"금속을 끌어당기거나 밀어냄", g:"2급"}
+  ];
+
+  // 필드별 랜덤 풀
+  const POOL = {
+    surname: ["아카바네","시로가네","쿠로사키","호시노","아마미야","후유츠키","나츠메","유키무라","사이온지","미카게","텐도우","코노에","이자요이","야가미","시라토리","아사히나","츠키오카","라이도우","네코미야","하야카와"],
+    givenM: ["소라","하루","렌","카이","유우토","리쿠토","아오이","츠카사","하야테","진","레오","슈","이츠키","마코토","케이"],
+    givenF: ["아카리","미유","리세","호타루","유메","치사","코하루","마이","린","사야","노도카","스즈","아야메","키리에","히나"],
+    givenN: ["아즈사","마코토","히카루","카오루","치하루","시온","츠구미","이즈미","레이","노아"],
+    first: ["나","저","본인","이쪽","오레","보쿠","와타시"],
+    pers: [
+      "무심한 척 챙기는 츤데레, 눈치 빠름",
+      "낙천적 분위기 메이커, 겁은 많음",
+      "냉정 침착, 속으로만 걱정 폭발",
+      "능글맞은 허당, 결정적일 때 진지",
+      "과묵 성실, 남 부탁 거절 못 함",
+      "삐딱한 독설가, 정에 약함",
+      "천진난만 폭주 기관차, 뒷수습 특기",
+      "완벽주의 잔소리꾼, 은근 오지랖",
+      "게으른 천재형, 흥미 없으면 방관",
+      "밝은 관종끼, 혼자일 땐 현타",
+      "소심한 관찰자, 위기 때 대담해짐",
+      "직진 열혈, 계산 안 하고 몸부터",
+      "차분한 중재자, 화나면 무서움",
+      "장난기 많은 능구렁이, 비밀 많음",
+      "무기력·염세, 소중한 것엔 필사적"
+    ],
+    bg: [
+      "레이와 같은 고아원 출신, 빚에 쫓기는 중",
+      "관리청 말단 사무직, 현장을 동경함",
+      "평범한 대학생인 줄 알았으나 각인 발현",
+      "각인 재해로 가족을 잃고 복수를 벼름",
+      "리코 방송의 열혈 구독자였다가 합류",
+      "뒷골목 심부름꾼, 정보에 빠삭함",
+      "몰락한 각인자 명문가의 막내",
+      "기억 일부를 잃은 채 눈을 뜬 편입생",
+      "일식회에서 도망쳐 나온 전 구성원",
+      "각인 없이 버텨온 일반인, 최근 각성",
+      "신스케에게 검을 배운 문하생",
+      "해외에서 귀국한 각인 연구원 지망생",
+      "낮엔 편의점 알바, 밤엔 각인 재해 목격자",
+      "쌍둥이 형제가 일식회에 붙잡혀 있음",
+      "원인 불명의 각인 폭주 전력이 있음"
+    ],
+    weapon: ["접이식 특수봉","호신용 스턴건","낡은 목검","커스텀 손목 건틀릿","투척용 카드 뭉치","경량 단검 두 자루","전투용 우산","와이어 발사기","방검 재킷","없음(맨몸·각인 위주)","야구 배트","휴대용 방패","체인 채찍","표창 세트","호루라기와 삼단봉"],
+    item: ["스마트폰, 낡은 회중시계","각인관리청 임시 신분증","리코LIVE 굿즈 키링","응급 처치 키트","반쯤 먹은 크레페 영수증","돌아가신 부모의 사진","일식회 암호가 적힌 쪽지","충전 케이블과 보조배터리","고양이 스티커 붙은 수첩","비상금과 편의점 쿠폰","금 간 부적","이어폰과 진통제","접이식 우산, 손수건","의문의 구멍 뚫린 동전","훈련 일지와 볼펜"],
+    appear: [
+      "흑발 단발·날카로운 눈매·마른 체형","밝은 갈색 머리·큰 눈·평범 체격","은발 롱헤어·무표정·장신",
+      "적발 포니테일·주근깨·잔근육","청발 숏컷·처진 눈·작은 체구","금발 곱슬·능글 미소·중간 키",
+      "흑발 장발·안경·창백한 피부","백발 뱅헤어·붉은 눈·중성적","연보라 반묶음·나른한 눈·슬렌더",
+      "갈색 투블럭·보조개·건강한 체격","먹색 포니·흉터·다부진 체구","분홍 그라데·피어싱·화려한 인상",
+      "짙은 남색 단발·날렵한 턱선·큰 키","회백색 부스스머리·다크서클·마름","주황빛 웨이브·활발한 눈매·평균 체형"
+    ]
+  };
+  const pick = arr => arr[Math.floor((performance.now()*997 + Math.random()*1e6)) % arr.length];
+
+  // 시작설정별 소속·배경 풀
+  const SCN = {
+    "소꿉친구": {
+      affil: ["서광반","민간","무소속"],
+      bg: [
+        "레이·리코와 같은 동네에서 자란 소꿉친구","셋이 늘 붙어다니던 어린 시절 친구",
+        "레이의 무모함을 곁에서 말려온 사이","리코 방송의 1호 시청자이자 오랜 친구",
+        "한동안 이사 갔다 최근 돌아온 옛 친구","같은 고아원에서 함께 자란 형제 같은 사이",
+        "레이가 각인에 눈뜨기 전부터 알던 친구","방과 후엔 늘 셋이 시부야를 쏘다니던 사이"
+      ]
+    },
+    "내통자": {
+      affil: ["일식회","무소속","관리청"],
+      bg: [
+        "일식회에 잠입한 관리청 내통자","서광반에 정보를 흘리는 일식회 이중첩자",
+        "양쪽을 저울질하는 정보 브로커","가족을 인질로 잡혀 정보를 넘기는 처지",
+        "자의로 일식회를 배신하기 시작한 구성원","각인 재해 진실을 캐다 이중생활에 빠짐",
+        "누구 편인지 스스로도 모르는 회색분자","정보값으로 목숨을 부지하는 밀고자"
+      ]
+    },
+    "자유설정": { affil: ["서광반","관리청","일식회","무소속","민간"], bg: POOL.bg }
+  };
+
+  /* ---------- 세그먼트 (성별/소속) ---------- */
+  function bindSeg(segId, key){
+    $(segId).querySelectorAll("button").forEach(b=>{
+      b.addEventListener("click",()=>{
+        const same = state[key]===b.dataset.v;
+        $(segId).querySelectorAll("button").forEach(x=>x.classList.remove("on"));
+        if(!same){ b.classList.add("on"); state[key]=b.dataset.v; }
+        else state[key]="";
+        render();
+      });
+    });
+  }
+  bindSeg("segSex","sex");
+  bindSeg("segAffil","affil");
+
+  /* ---------- 시작설정 선택 + 나이 잠금 ---------- */
+  const FIXED_AGE = new Set(["소꿉친구","내통자"]);
+  function applyAgeLock(){
+    const fix = FIXED_AGE.has(state.scenario);
+    const ageEl = $("fAge"), lock = $("ageLock");
+    if(fix){
+      state.age = "20"; ageEl.value = "20"; ageEl.readOnly = true;
+      lock.textContent = "· 20세 고정";
+    } else {
+      ageEl.readOnly = false; lock.textContent = state.scenario==="자유설정" ? "· 자유" : "";
+    }
+  }
+  const SCN_NOTE = {
+    "소꿉친구":"레이·리코의 소꿉친구. 나이 20세 고정, 소속은 서광반·민간 위주로 뽑힘.",
+    "내통자":"양 진영 사이의 내통자. 나이 20세 고정, 소속·배경이 이중첩자 쪽으로 뽑힘.",
+    "자유설정":"세계관 자유. 나이 제한 해제, 외형까지 전체 랜덤에 포함됨."
+  };
+  $("segScn").querySelectorAll("button").forEach(b=>{
+    b.addEventListener("click",()=>{
+      const same = state.scenario===b.dataset.v;
+      $("segScn").querySelectorAll("button").forEach(x=>x.classList.remove("on"));
+      if(!same){ b.classList.add("on"); state.scenario=b.dataset.v; }
+      else state.scenario="";
+      $("scnNote").textContent = state.scenario ? SCN_NOTE[state.scenario] : "시작설정을 고르면 나이·소속·배경이 그에 맞춰 랜덤 생성됨.";
+      applyAgeLock();
+      render();
+    });
+  });
+
+  /* ---------- 등급 ---------- */
+  $("grades").querySelectorAll(".grade").forEach(g=>{
+    g.addEventListener("click",()=>{
+      const same = state.grade===g.dataset.g;
+      $("grades").querySelectorAll(".grade").forEach(x=>x.classList.remove("on"));
+      if(!same){ g.classList.add("on"); state.grade=g.dataset.g; }
+      else state.grade="";
+      $("gradeWarn").classList.toggle("show", state.grade==="1급"||state.grade==="특급");
+      render();
+    });
+  });
+
+  /* ---------- 텍스트 인풋 바인딩 ---------- */
+  const binds = [
+    ["fName","name"],["fAge","age"],["fFirst","first"],["fAppear","appear"],
+    ["fMark","mark"],["fTrue","true_"],["fEff","eff"],
+    ["fPers","pers"],["fBg","bg"],["fWeapon","weapon"],["fItem","item"]
+  ];
+  binds.forEach(([id,key])=>{
+    $(id).addEventListener("input",e=>{ state[key]=e.target.value; render(); });
+  });
+
+  /* ---------- 각인 없음 토글 ---------- */
+  $("fNone").addEventListener("change",e=>{
+    state.none = e.target.checked;
+    $("awakenFields").classList.toggle("dim", state.none);
+    render();
+  });
+
+  /* ---------- 각인 적용 헬퍼 ---------- */
+  function applyIdea(it){
+    if(state.none){ $("fNone").checked=false; state.none=false; $("awakenFields").classList.remove("dim"); }
+    $("fMark").value = it.m; state.mark = it.m;
+    $("fTrue").value = it.t; state.true_ = it.t;
+    $("fEff").value = it.e; state.eff = it.e;
+    state.grade = it.g;
+    $("grades").querySelectorAll(".grade").forEach(x=>x.classList.toggle("on", x.dataset.g===it.g));
+    $("gradeWarn").classList.toggle("show", it.g==="1급"||it.g==="특급");
+  }
+  function randName(){
+    const sx = state.sex || pick(["남","여","기타"]);
+    const g = sx==="남" ? POOL.givenM : sx==="여" ? POOL.givenF : POOL.givenN;
+    const nm = pick(POOL.surname) + " " + pick(g);
+    $("fName").value = nm; state.name = nm;
+  }
+  function randSex(){
+    state.sex = pick(["남","여","기타"]);
+    $("segSex").querySelectorAll("button").forEach(b=>b.classList.toggle("on", b.dataset.v===state.sex));
+  }
+  function randAffil(){
+    state.affil = pick(["서광반","관리청","일식회","무소속","민간"]);
+    $("segAffil").querySelectorAll("button").forEach(b=>b.classList.toggle("on", b.dataset.v===state.affil));
+  }
+
+  /* 각인 뽑기 버튼 */
+  $("genBtn").addEventListener("click",()=>{ applyIdea(pick(IDEAS)); render(); });
+
+  /* 필드별 🎲 버튼 */
+  document.querySelectorAll(".dice").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const r = btn.dataset.r;
+      if(r==="name"){ randName(); }
+      else if(r==="pers"){ const v=pick(POOL.pers); $("fPers").value=v; state.pers=v; }
+      else if(r==="bg"){ const v=pick(POOL.bg); $("fBg").value=v; state.bg=v; }
+      else if(r==="weapon"){ const v=pick(POOL.weapon); $("fWeapon").value=v; state.weapon=v; }
+      else if(r==="item"){ const v=pick(POOL.item); $("fItem").value=v; state.item=v; }
+      else if(r==="appear"){ const v=pick(POOL.appear); $("fAppear").value=v; state.appear=v; }
+      render();
+    });
+  });
+
+  /* 전체 랜덤 생성 (시작설정 반영) */
+  $("randAll").addEventListener("click",()=>{
+    // 시작설정 미선택 시 자유설정으로 자동 처리
+    if(!state.scenario){
+      state.scenario = "자유설정";
+      $("segScn").querySelectorAll("button").forEach(x=>x.classList.toggle("on", x.dataset.v==="자유설정"));
+      $("scnNote").textContent = SCN_NOTE["자유설정"];
+    }
+    const scn = state.scenario;
+    randSex();
+    randName();
+    // 나이: 소꿉친구·내통자=20 고정 / 자유설정=16~45 랜덤
+    if(FIXED_AGE.has(scn)){ state.age="20"; }
+    else { state.age = String(16 + Math.floor((performance.now()*13 + Math.random()*100) % 30)); }
+    applyAgeLock();
+    $("fAge").value = state.age;
+    const f = pick(POOL.first); $("fFirst").value=f; state.first=f;
+    // 외형: 자유설정만 전체 랜덤에 포함
+    if(scn==="자유설정"){ const a=pick(POOL.appear); $("fAppear").value=a; state.appear=a; }
+    applyIdea(pick(IDEAS));           // 각인 (4~3급 위주 풀이라 밸런스 안전)
+    // 소속: 시작설정별 가중
+    state.affil = pick(SCN[scn].affil);
+    $("segAffil").querySelectorAll("button").forEach(x=>x.classList.toggle("on", x.dataset.v===state.affil));
+    const p = pick(POOL.pers); $("fPers").value=p; state.pers=p;
+    const b = pick(SCN[scn].bg); $("fBg").value=b; state.bg=b;  // 배경도 시작설정별
+    const w = pick(POOL.weapon); $("fWeapon").value=w; state.weapon=w;
+    const it = pick(POOL.item); $("fItem").value=it; state.item=it;
+    render();
+  });
+
+  /* ---------- 글자수 헬퍼 ---------- */
+  function setCnt(id, val, max){
+    const el = $(id); if(!el) return;
+    const n = [...(val||"")].length;
+    el.textContent = `${n}/${max}`;
+    el.classList.toggle("warn", n>max);
+    el.classList.toggle("ok", n>0 && n<=max);
+  }
+  const len = s => [...(s||"")].length;
+
+  /* ---------- 페르소나 정보 100자 자동 조립 ---------- */
+  function buildInfo(){
+    const parts = [];
+    // 각인
+    if(state.none){
+      parts.push("각인 없음(미각성)");
+    } else if(state.mark){
+      let k = state.mark;
+      if(state.true_) k += `「${state.true_}」`;
+      if(state.eff) k += `-${state.eff}`;
+      parts.push(k);
+    }
+    if(state.grade && !state.none) parts.push(state.grade);
+    if(state.affil) parts.push(state.affil);
+    if(state.appear) parts.push(state.appear);
+    if(state.pers) parts.push(state.pers);
+    if(state.bg) parts.push(state.bg);
+    return parts.join(" / ");
+  }
+
+  /* ---------- 렌더 ---------- */
+  function render(){
+    // 카운터
+    setCnt("cntName", state.name, 12);
+    setCnt("cntMark", state.mark, 8);
+    setCnt("cntTrue", state.true_, 10);
+    setCnt("cntEff", state.eff, 40);
+    setCnt("cntPer", state.pers, 30);
+    setCnt("cntBg", state.bg, 40);
+    setCnt("cntApp", state.appear, 30);
+
+    // 프리뷰 카드
+    $("pvName").innerHTML = state.name ? esc(state.name) : '<span class="anon">미등록 각인자</span>';
+    const sex = state.sex || "—";
+    const age = state.age ? state.age+"세" : "—";
+    const scnTag = state.scenario ? ` · ${state.scenario}` : "";
+    $("pvMeta").textContent = `${sex} · ${age}${scnTag}`;
+    const pvId = $("pvId");
+    pvId.textContent = state.name ? "NO." + ("000"+([...state.name].reduce((a,c)=>a+c.charCodeAt(0),0)%9999)).slice(-4) : "NO.—";
+
+    const pg = $("pvGrade");
+    if(state.none){ pg.textContent="일반인 · 미각성"; pg.className="id-grade none"; }
+    else if(state.grade){ pg.textContent=state.grade+" 각인자"; pg.className="id-grade"; }
+    else { pg.textContent="등급 미판정"; pg.className="id-grade none"; }
+
+    if(state.none){
+      $("pvMark").textContent = "없음";
+      $("pvEff").textContent = "";
+    } else {
+      $("pvMark").innerHTML = state.mark
+        ? esc(state.mark) + (state.true_ ? ` <small>「${esc(state.true_)}」</small>` : "")
+        : "미입력";
+      $("pvEff").textContent = state.eff || "";
+    }
+    const affilColor = {"일식회":"var(--red)","관리청":"var(--cyan)","서광반":"var(--gold)"}[state.affil] || "var(--dim)";
+    $("pvAffil").innerHTML = state.affil ? `<span style="color:${affilColor}">◈ ${esc(state.affil)}</span>` : "";
+    $("pvAppear").textContent = state.appear ? "🜃 " + state.appear : "";
+
+    // 출력 슬롯
+    const nameOut = state.name || "";
+    $("oName").textContent = nameOut;
+    setCnt("cName", nameOut, 12);
+
+    const info = buildInfo();
+    $("oInfo").textContent = info;
+    setCnt("cInfo", info, 150);
+
+    // INFO 블록 미리보기
+    const w = state.weapon || "없음";
+    const it = state.item || "없음";
+    const mk = state.none ? "없음" : (state.mark || "미입력");
+    $("infoPreview").innerHTML =
+`<span class="d">[ INFO 표시 예시 ]</span>
+[ <span class="c">${esc(nameOut||"ⓤ")}</span> ｜ ${esc(sex)} ｜ ${esc(age)} ｜ 각인 <span class="g">${esc(mk)}</span> ｜ ... ｜ 위치 ]
+[무기 ｜ ${esc(w)}]
+[인벤토리 ｜ ${esc(it)}]`;
+  }
+
+  function esc(s){ return String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+
+  /* ---------- 복사 ---------- */
+  document.querySelectorAll(".copy").forEach(btn=>{
+    btn.addEventListener("click",async()=>{
+      const txt = $(btn.dataset.t).textContent;
+      try{ await navigator.clipboard.writeText(txt); }
+      catch(_){ const ta=document.createElement("textarea"); ta.value=txt; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove(); }
+      const orig = btn.textContent;
+      btn.textContent = "✓ 복사됨"; btn.classList.add("done");
+      setTimeout(()=>{ btn.textContent=orig; btn.classList.remove("done"); }, 1400);
+    });
+  });
+
+  render();
+</script>
+</body>
+</html>
